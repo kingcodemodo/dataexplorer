@@ -154,7 +154,7 @@ function Settings({table,valueProp,setValueProp}) {
                 </FormField>
             )}
             {table && (
-                <FormField label="Dimension" width="22%" paddingLeft={1} marginBottom={0}>
+                <FormField label="Dimension" width="22%" paddingX={1} marginBottom={0}>
                     <FieldPickerSynced
                         table={table}
                         globalConfigKey={GlobalConfigKeys.X_FIELD_ID}
@@ -162,12 +162,16 @@ function Settings({table,valueProp,setValueProp}) {
                 </FormField>
             )}
             {table && (
-                <SelectButtons
-                    value={valueProp}
-                    onChange={newValue => setValueProp(newValue)}
-                    options={options}
-                    width="12%"
-                />
+                <FormField label="Group By" width="22%" paddingX={1} marginBottom={0}>
+                    <SelectButtons
+                        value={valueProp}
+                        onChange={newValue => setValueProp(newValue)}
+                        options={options}
+                        paddingLeft={1}
+                        marginBottom={0}
+                        width="100%"
+                    />
+                </FormField>
             )}
         </Box>
     );
