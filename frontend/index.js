@@ -34,10 +34,10 @@ function DataExplorer() {
     const base = useBase();
     const globalConfig = useGlobalConfig();
 
-    const [value, setValue] = useState(options[0].value);
-
     const tableId = globalConfig.get(GlobalConfigKeys.TABLE_ID);
     const table = base.getTableByIdIfExists(tableId);
+
+    const [value, setValue] = useState(options[0].value);
 
     const viewId = globalConfig.get(GlobalConfigKeys.VIEW_ID);
     const view = table ? table.getViewByIdIfExists(viewId) : null;
@@ -50,7 +50,8 @@ function DataExplorer() {
 
     const records = useRecords(view);
 
-    const data = records && xField ? getChartData({records, xField}) : null;
+    const siteOrRoom = value
+    const data = records && xField ? getChartData({records, xField, siteOrRoom}) : null;
 
 
     return (
@@ -98,13 +99,13 @@ function reduce(arr, reducer, initialValue) {
     return accumulator;
   }
 
-function getChartData({records, xField}) {
+function getChartData({records, xField, siteOrRoom}) {
     const recordsByXValueString = new Map();
     for (const record of records) {
 
         // Hard Coded Value To Tie Data Explorer To Particular Table
-        const xValue = record.getCellValue(GlobalConfigKeys.SITE_ROOM_SWITCH);
-        const xValueString = xValue === null ? null : record.getCellValueAsString("Site");
+        const xValue = record.getCellValue(siteOrRoom);
+        const xValueString = xValue === null ? null : record.getCellValueAsString(siteOrRoom);
 
         if (!recordsByXValueString.has(xValueString)) {
             recordsByXValueString.set(xValueString, [record]);
@@ -117,20 +118,14 @@ function getChartData({records, xField}) {
     const points = [];
     for (const [xValueString, records] of recordsByXValueString.entries()) {
         const label = xValueString === null ? 'Empty' : xValueString;
+        const valueset = records.map((record)=>record.getCellValue(xField)).reduce(function(acc, val) { return acc + val; }, 0)
+
+        // Add Entity/Label To Graph
         labels.push(label);
+
+        // Add Datapoints for Each Entity To Graph
+        points.push(valueset)
         
-        points.push(records.map((record)=>record.getCellValue(xField)).reduce(function(acc, val) { return acc + val; }, 0))
-        
-        // points.push()
-        // if (records.length == 1){
-        //     points.push(records[0].getCellValue(xField));
-        // }
-        // else if records.length > 1{
-        //     var sum = 0
-        //     for (item of records){
-        //         sum = sum + item.getCellValue()
-        //     }
-        // }
     }
 
     const data = {
@@ -169,8 +164,7 @@ function Settings({table,valueProp,setValueProp}) {
             {table && (
                 <SelectButtons
                     value={valueProp}
-                    onChange={newValue => setValue(newValue)}
-                    
+                    onChange={newValue => setValueProp(newValue)}
                     options={options}
                     width="12%"
                 />
