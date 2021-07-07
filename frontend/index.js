@@ -66,7 +66,7 @@ function DataExplorer() {
         >
             <Settings table={table} valueProp={value} setValueProp = {setValue}/>
             {data && (
-                <Box position="relative" flex="auto" padding={3}>
+                <Box position="relative" padding={3} height="90%">
                     <Bar
                         data={data}
                         options={{
