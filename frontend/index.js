@@ -9,11 +9,9 @@ import {
     Box,
     FormField,
 } from '@airtable/blocks/ui';
+
 import React, { useReducer, useState, useEffect } from 'react';
 
-// This app uses chart.js and the react-chartjs-2 packages.
-// Install them by running this in the terminal:
-// npm install chart.js react-chartjs-2
 import {Bar} from 'react-chartjs-2';
 
 import { SelectButtons } from "@airtable/blocks/ui"
@@ -28,7 +26,9 @@ const GlobalConfigKeys = {
     SITE_ROOM_SWITCH: "Site"
 };
 
-const options = [{value:"Room",label:"Room"},{value:"Site",label:"Site"}];
+const groupByOptions = [{value:"Room",label:"Room"},{value:"Site",label:"Site"}];
+
+const chartMetricOptions = [{value:"Chart",label:"Chart"},{value:"Metrics",label:"Metrics"}];
 
 function DataExplorer() {
     const base = useBase();
@@ -37,7 +37,7 @@ function DataExplorer() {
     const tableId = globalConfig.get(GlobalConfigKeys.TABLE_ID);
     const table = base.getTableByIdIfExists(tableId);
 
-    const [value, setValue] = useState(options[0].value);
+    const [value, setValue] = useState(groupByOptions[0].value);
 
     const viewId = globalConfig.get(GlobalConfigKeys.VIEW_ID);
     const view = table ? table.getViewByIdIfExists(viewId) : null;
@@ -53,7 +53,6 @@ function DataExplorer() {
     const siteOrRoom = value
     const data = records && xField ? getChartData({records, xField, siteOrRoom}) : null;
 
-
     return (
         <Box
             position="absolute"
@@ -64,9 +63,10 @@ function DataExplorer() {
             display="flex"
             flexDirection="column"
         >
-            <Settings table={table} valueProp={value} setValueProp = {setValue}/>
+        
+        <Settings table={table} valueProp={value} setValueProp = {setValue}/>
             {data && (
-                <Box position="relative" padding={3} height="90%">
+                <Box position="relative" padding={3} height="65%">
                     <Bar
                         data={data}
                         options={{
@@ -116,7 +116,10 @@ function getChartData({records, xField, siteOrRoom}) {
 
     const labels = [];
     const points = [];
+    
     for (const [xValueString, records] of recordsByXValueString.entries()) {
+
+        // Extract Data Values & Label
         const label = xValueString === null ? 'Empty' : xValueString;
         const valueset = records.map((record)=>record.getCellValue(xField)).reduce(function(acc, val) { return acc + val; }, 0)
 
@@ -162,11 +165,23 @@ function Settings({table,valueProp,setValueProp}) {
                 </FormField>
             )}
             {table && (
-                <FormField label="Group By" width="22%" paddingX={1} marginBottom={0}>
+                <FormField label="Group By" width="17%" paddingX={1} marginBottom={0}>
                     <SelectButtons
                         value={valueProp}
                         onChange={newValue => setValueProp(newValue)}
-                        options={options}
+                        options={groupByOptions}
+                        paddingLeft={1}
+                        marginBottom={0}
+                        width="100%"
+                    />
+                </FormField>
+            )}
+            {table && (
+                <FormField label="Chart / Metrics" width="17%" paddingLeft={1} marginBottom={0}>
+                    <SelectButtons
+                        value={valueProp}
+                        onChange={newValue => setValueProp(newValue)}
+                        options={chartMetricOptions}
                         paddingLeft={1}
                         marginBottom={0}
                         width="100%"
