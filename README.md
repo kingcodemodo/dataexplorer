@@ -1,24 +1,20 @@
-# Simple chart app
+# Data Explorer App
 
-This example app shows a bar chart of data from a table.
+The Data Explorer App provides an dynamic nteractive visualisation Tool to explore and summarise datapoints about the performance of different Wimbletech Sites and Rooms
 
-The code shows:
+The Tool's Current Scope:
 
--   How to use the Chart.js external library.
+-   Allows Visualisation of All Numerical Field in Our "Floor Plan - Live Data" Airtable
 
--   How to store app-related data using `globalConfig` and `Synced` UI components.
+-   Allows Toggling between Summarising Data by Room or By Site
 
-## How to run this app
+## Future Features
 
-1. Create a new base using the
-   [Sales CRM template](https://airtable.com/templates/sales-and-customers/expvjTzYAZareV1pt/sales-crm).
+1. Have Another Toggle To Switch Between Graph Visualisation and A Printout of Key Metrics e.g Graph / Dashboard Mode
 
-2. Create a new app in your new base (see
-   [Create a new app](https://airtable.com/developers/blocks/guides/hello-world-tutorial#create-a-new-app)),
-   selecting "Simple chart" as your template.
+2. Have An Option To Click In To Particular Bars Room and When Clicking On A Particular Room Load Up A Room Specific Print Out with Metrics On Individual Rooms
 
-3. From the root of your new app, run `block run`.
 
 ## See the app running
 
-![App updating chart as the user changes data](media/block.gif)
+![App updating chart as the user changes data](media/DataVisDemoGif.gif)
