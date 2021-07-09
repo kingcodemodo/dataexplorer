@@ -17,4 +17,4 @@ The Tool's Current Scope:
 
 ## See the app running
 
-![App updating chart as the user changes data](media/block.gif)
+![App updating chart as the user changes data](media/DataVisDemoGif.gif)
