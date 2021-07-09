@@ -17,4 +17,4 @@ The Tool's Current Scope:
 
 ## See the app running
 
-![App updating chart as the user changes data](https://gifyu.com/image/BECH)
+![App updating chart as the user changes data](DataVisDemoGif.gif)
