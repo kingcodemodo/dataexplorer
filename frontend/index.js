@@ -18,6 +18,8 @@ import { SelectButtons } from "@airtable/blocks/ui"
 
 import { globalConfig } from '@airtable/blocks';
 
+import DataTable from 'react-data-table-component'
+
 const GlobalConfigKeys = {
     TABLE_ID: 'tableId',
     VIEW_ID: 'viewId',
@@ -26,9 +28,14 @@ const GlobalConfigKeys = {
     SITE_ROOM_SWITCH: "Site"
 };
 
+// Options For Selecting Between Room/Site Groupings of Data
 const groupByOptions = [{value:"Room",label:"Room"},{value:"Site",label:"Site"}];
 
+// Options For Selecting Between Visualising Data In Numerical Form or Graph For
 const chartMetricOptions = [{value:"Chart",label:"Chart"},{value:"Metrics",label:"Metrics"}];
+
+// Key Value Store To Lookup What Size Components Should Be When The System Re-Structures For Chart / Numerical Modes
+const componentSizeLookup = {"Chart" : "90%", "Metrics" : "0%"};
 
 function DataExplorer() {
     const base = useBase();
@@ -37,7 +44,10 @@ function DataExplorer() {
     const tableId = globalConfig.get(GlobalConfigKeys.TABLE_ID);
     const table = base.getTableByIdIfExists(tableId);
 
-    const [value, setValue] = useState(groupByOptions[0].value);
+    const [state, setState] = useState({groupByState : groupByOptions[0].value,
+                                        chartMetricState : chartMetricOptions[0].value,
+                                        graphSize : "65%",
+                                        metricsSize : "100%"});
 
     const viewId = globalConfig.get(GlobalConfigKeys.VIEW_ID);
     const view = table ? table.getViewByIdIfExists(viewId) : null;
@@ -49,9 +59,8 @@ function DataExplorer() {
     const yField = table ? table.getFieldByIdIfExists(yFieldId) : null;
 
     const records = useRecords(view);
-
-    const siteOrRoom = value
-    const data = records && xField ? getChartData({records, xField, siteOrRoom}) : null;
+    
+    const data = records && xField ? getChartData({records, xField, state}) : null;
 
     return (
         <Box
@@ -64,9 +73,9 @@ function DataExplorer() {
             flexDirection="column"
         >
         
-        <Settings table={table} valueProp={value} setValueProp = {setValue}/>
+        <Settings table={table} stateProp={state} setStateProp = {setState}/>
             {data && (
-                <Box position="relative" padding={3} height="65%">
+                <Box position="relative" padding={3} height={state.graphSize}>
                     <Bar
                         data={data}
                         options={{
@@ -87,6 +96,13 @@ function DataExplorer() {
                     />
                 </Box>
             )}
+            {/* {state.chartMetricState === "Metrics" && (
+                <Box position="relative" padding={3} height={state.metricsSize}>
+                    Yellow
+                </Box>
+            )} */}
+            {state.chartMetricState === "Metrics" && MetricsUI(state)}
+
         </Box>
     );
 }
@@ -99,13 +115,13 @@ function reduce(arr, reducer, initialValue) {
     return accumulator;
   }
 
-function getChartData({records, xField, siteOrRoom}) {
+function getChartData({records, xField, state}) {
     const recordsByXValueString = new Map();
     for (const record of records) {
 
-        // Hard Coded Value To Tie Data Explorer To Particular Table
-        const xValue = record.getCellValue(siteOrRoom);
-        const xValueString = xValue === null ? null : record.getCellValueAsString(siteOrRoom);
+        // The Query of the Records 
+        const xValue = record.getCellValue(state.groupByState);
+        const xValueString = xValue === null ? null : record.getCellValueAsString(state.groupByState);
 
         if (!recordsByXValueString.has(xValueString)) {
             recordsByXValueString.set(xValueString, [record]);
@@ -140,10 +156,22 @@ function getChartData({records, xField, siteOrRoom}) {
             },
         ],
     };
+    console.log("data.labels========================================")
+    console.log(data.labels)
+    console.log("===================================================")
+    console.log("data.datasets======================================")
+    console.log(data.datasets)
+    console.log("===================================================")
+    console.log("data.datasets.data=================================")
+    console.log(data.datasets[0].data)
+    console.log("===================================================")
+    console.log("data.datasets.data.points==========================")
+    console.log(data.datasets[0].data.points)
+    console.log("===================================================")
     return data;
 }
 
-function Settings({table,valueProp,setValueProp}) {
+function Settings({table,stateProp,setStateProp}) {
 
     return (
 
@@ -167,8 +195,8 @@ function Settings({table,valueProp,setValueProp}) {
             {table && (
                 <FormField label="Group By" width="17%" paddingX={1} marginBottom={0}>
                     <SelectButtons
-                        value={valueProp}
-                        onChange={newValue => setValueProp(newValue)}
+                        value={stateProp.groupByState}
+                        onChange={newValue => setStateProp({...stateProp, groupByState : newValue})}
                         options={groupByOptions}
                         paddingLeft={1}
                         marginBottom={0}
@@ -176,11 +204,11 @@ function Settings({table,valueProp,setValueProp}) {
                     />
                 </FormField>
             )}
-            {table && (
-                <FormField label="Chart / Metrics" width="17%" paddingLeft={1} marginBottom={0}>
+            {(
+                <FormField label="Chart or Metrics" width="17%" paddingLeft={1} marginBottom={0}>
                     <SelectButtons
-                        value={valueProp}
-                        onChange={newValue => setValueProp(newValue)}
+                        value={stateProp.chartMetricState}
+                        onChange={newValue => setStateProp({...stateProp, chartMetricState : newValue, graphSize : componentSizeLookup[newValue]})}
                         options={chartMetricOptions}
                         paddingLeft={1}
                         marginBottom={0}
@@ -192,4 +220,11 @@ function Settings({table,valueProp,setValueProp}) {
     );
 }
 
+function MetricsUI(state){
+    return(
+        <Box position="relative" padding={3} height={state.metricsSize}>
+            Yellow
+        </Box>
+    )
+}
 initializeBlock(() => <DataExplorer />);
