@@ -221,9 +221,35 @@ function Settings({table,stateProp,setStateProp}) {
 }
 
 function MetricsUI(state){
+
+    // 
+    const tableData = [{field1: 1, field2 : "Yes", field3 : "No"},{field1: 2, field2 : "Yes", field3 : "No"}]
+    
+    // This function will read all data from the airtable blocks SDK and parse it into a labelled data structure for headers
+    const headers = [
+        {
+        name: "Field1",
+        selector: 'field1',
+        sortable: true,
+    }, 
+    {
+        name: "Field2",
+        selector: 'field2',
+        sortable: true,
+    },
+    {
+        name: "Field3",
+        selector: 'field3',
+        sortable: true,
+    }, 
+]
     return(
-        <Box position="relative" padding={3} height={state.metricsSize}>
-            Yellow
+        <Box position="relative" padding={"5%"} height={state.metricsSize} width={"40%"}>
+            <DataTable
+                title="Metrics"
+                columns={headers}
+                data={tableData}
+            />
         </Box>
     )
 }
