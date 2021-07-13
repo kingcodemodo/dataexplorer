@@ -96,7 +96,12 @@ function DataExplorer() {
                     />
                 </Box>
             )}
-            {state.chartMetricState === "Metrics" && MetricsUI(records,state)}
+            {/* {state.chartMetricState === "Metrics" && (
+                <Box position="relative" padding={3} height={state.metricsSize}>
+                    Yellow
+                </Box>
+            )} */}
+            {state.chartMetricState === "Metrics" && MetricsUI(state)}
 
         </Box>
     );
@@ -132,10 +137,6 @@ function getChartData({records, xField, state}) {
 
         // Extract Data Values & Label
         const label = xValueString === null ? 'Empty' : xValueString;
-
-        // For Every Record In The List Of Records Assigned To An X Value String Extract Only The Field That Is Wanted
-        // Create Instead A List Of Values For Just That Field
-        // Using Reduce Walk Through That List And Accumulate All The Values Into A Single field
         const valueset = records.map((record)=>record.getCellValue(xField)).reduce(function(acc, val) { return acc + val; }, 0)
 
         // Add Entity/Label To Graph
@@ -219,96 +220,22 @@ function Settings({table,stateProp,setStateProp}) {
     );
 }
   
-function MetricsUI({records, state}) {
-    
-    // COMMENTED const recordsByXValueString = new Map();
+function MetricsUI(state){
 
-    // //Iterate Over Records
-    // for (const record of records) {
-
-    //     // The Query of the Records 
-    //     const xValue = record.getCellValue(state.groupByState);
-    //     const xValueString = xValue === null ? null : record.getCellValueAsString(state.groupByState);
-
-    //     //Update Key/Value Sorting Records By Either Group or Room According To User Preference
-    //     //For Those Records With Matching ID Fields, Assemble A List of Records
-    //     if (!recordsByXValueString.has(xValueString)) {
-    //         recordsByXValueString.set(xValueString, [record]);
-    //     } else {
-    //         recordsByXValueString.get(xValueString).push(record);
-    //     }
-    // COMMENTED }
-
+    // 
     const headers = [
-            {name: "Room", selector: 'Room', sortable: true}, 
-            {name: "Site", selector: 'Site', sortable: true},
-            {name: "Required Fill", selector: 'Required Fill', sortable: true}, 
-            {name: "Desk Price", selector: 'Desk Price', sortable: true}, 
-            {name: "Spaces Taken", selector: 'Spaces Taken', sortable: true}, 
-            {name: "Spaces Left", selector: 'Spaces Left', sortable: true}, 
-            {name: "Desk Count", selector: 'Desk Count', sortable: true}, 
-            {name: "Member Count", selector: 'Member Count', sortable: true}, 
-            {name: "Revenue", selector: 'Revenue', sortable: true}
-        ]
-
-    //COMMENTED // Processing Each Record Grouped By ID
-    // for (const [xValueString, records] of recordsByXValueString.entries()) {
-
-    //     // Extract Data Values & Label
-    //     const label = xValueString === null ? 'Empty' : xValueString;
-
-    //     // This Function Will Take Out Each Value For Each Field in The Airtable
-    //     // And Parse Them Individually Into A Templated Object To Assemble The List Of Records In The Table One By One
-
-    //     // For Each Of The Records For Every Key (With Possible Overlaps Due To Duplicate Keys)
-    //     // Use Reduce To Aggregate Any Keys That Have Multiple Matching Keys
-    //     // 
-
-    //     // The Difference Here Is That We Want To Extract Each Field For Each Records
-    //     // And Then Reduce Each Field Down To It's Own Individual Value
-    //     // k,<Record>[Array] -> k, <{eachFieldName:valueForThatField, ...}>[Array]-> [{eachFieldName:eachValueForThatField, anotherFieldName}]
-    //     // A List Of Records for Each Key -> Multiple Records Of The Parsed Data Structure For Each Key ->
-    //     // First We Extract Each Field Of The Record And Append That Into An Object
-    //     // That Object Will Be Of The Format
-    //     const valueset = records.map((record)=>{
-    //                                                 var parsedRecord = {}
-    //                                                 for (item in headers){
-    //                                                     parsedRecord[item.name] = record.getCellValue(item.name)
-    //                                                 }
-    //                                                 console.log(parsedRecord)
-    //                                                 return parsedRecord;
-    //                                             }
-    //                                         )
-    //     var mergedParsedDataEntities = {}
-                                          
-    //     console.log("==========================================================")
-    //     //For Every Key In The Processed DataSet
-    //     for (key in valueset){
-    //         //Initialise A New Object That Will Store The Single Data Object Aggregating All Values
-    //         mergedParsedDataEntities[key] = {}
-    //         console.log("1 - " + key)
-    //         //For Every Object/Record Stored At That Key
-    //         for (item in valueset[key]){
-    //             console.log("   2 - " + item)
-    //             //And For Every Field In Each Of Those Objects
-    //             for (field in headers){
-    //                 console.log("       3 - " + field)
-    //                 // If The Field Does Not Already Exist In The New Merged Record
-    //                 // Then Lodge A Place In The Merged Parsed Data Object for That Header And Assign The First Value To It
-    //                 // If The Key Already Exists Then Add The Latest Value On To The Value Currently Stored
-    //                 //field in mergedParsedDataEntities[key] ? mergedParsedDataEntities[key][field] += valueset[key][field] : mergedParsedDataEntities[key][field] = valueset[key][field]
-    //             }
-    //         }
-    //     }
-    //     console.log("==========================================================")
-        
-        
-    // COMMENTED }
-
-    // headers = ["Room","Site","Required Fill","Desk Price","Spaces Taken",
-    //                         "Spaces Left","Desk Count","Member Count","Revenue","Desk Price"]
-
-    mergedParsedDataEntities = [
+        {name: "Room", selector: 'Room', sortable: true}, 
+        {name: "Site", selector: 'Site', sortable: true},
+        {name: "Required Fill", selector: 'Required Fill', sortable: true}, 
+        {name: "Desk Price", selector: 'Desk Price', sortable: true}, 
+        {name: "Spaces Taken", selector: 'Spaces Taken', sortable: true}, 
+        {name: "Spaces Left", selector: 'Spaces Left', sortable: true}, 
+        {name: "Desk Count", selector: 'Desk Count', sortable: true}, 
+        {name: "Member Count", selector: 'Member Count', sortable: true}, 
+        {name: "Revenue", selector: 'Revenue', sortable: true}
+    ]
+    // This function will read all data from the airtable blocks SDK and parse it into a labelled data structure for headers
+    const mergedParsedDataEntities = [
         {
           "Room": "AVO - Main Room",
           "Required Fill": "£0.00",
@@ -925,15 +852,16 @@ function MetricsUI({records, state}) {
           "Member Count": 3,
           "Desk Count": 10
         }
-      ]
-    
-    
+    ]
+
     return(
-        <Box position="relative" padding={"5%"} height={state.metricsSize} width={"40%"}>
+        <Box position="relative" padding={"2%"} height={state.metricsSize} width={"45%"}>
             <DataTable
                 title="Metrics"
                 columns={headers}
                 data={mergedParsedDataEntities}
+                pagination={true}
+                paginationPerPage={10}
             />
         </Box>
     )
